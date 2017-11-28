@@ -8,6 +8,7 @@ import networkx as nx
 from networkx import draw
 
 from dwave_networkx import _PY2
+from dwave_networkx.drawing.draw_utilities import color_map
 from dwave_networkx.generators.chimera import find_chimera_indices
 
 
@@ -220,25 +221,7 @@ def draw_chimera(G, linear_biases={}, quadratic_biases={},
         if edge_cmap is None:
             edge_cmap = plt.get_cmap('coolwarm')
 
-        # any edges or nodes with an unspecified bias default to 0
-        def edge_color(u, v):
-            c = 0.
-            if (u, v) in quadratic_biases:
-                c += quadratic_biases[(u, v)]
-            if (v, u) in quadratic_biases:
-                c += quadratic_biases[(v, u)]
-            return c
-
-        def node_color(v):
-            c = 0.
-            if v in linear_biases:
-                c += linear_biases[v]
-            if (v, v) in quadratic_biases:
-                c += quadratic_biases[(v, v)]
-            return c
-
-        node_color = [node_color(v) for v in nodelist]
-        edge_color = [edge_color(u, v) for u, v in edgelist]
+        node_color, edge_color = color_map(nodelist, edgelist, linear_biases, quadratic_biases)
 
         kwargs['edge_color'] = edge_color
         kwargs['node_color'] = node_color
@@ -255,7 +238,7 @@ def draw_chimera(G, linear_biases={}, quadratic_biases={},
         if edge_vmax is None:
             edge_vmax = vmag
 
-    draw(G, chimera_layout(G), nodelist=nodelist, edgelist=edgelist,
+    draw(G, pos=chimera_layout(G), nodelist=nodelist, edgelist=edgelist,
          cmap=cmap, edge_cmap=edge_cmap, vmin=vmin, vmax=vmax, edge_vmin=edge_vmin,
          edge_vmax=edge_vmax,
          **kwargs)
