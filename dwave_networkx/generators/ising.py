@@ -15,7 +15,7 @@ __all__ = ['ising_graph']
 if _PY2:
     range = xrange
 
-def ising_graph(h={}, J={}, attr_dict=None, create_using=None):
+def ising_graph(h={}, J={}, create_using=None, **kwargs):
     """Creates an Ising graph from the adjacency matrix.
 
     An Ising model is an undirected d-dimensional graph of a lattice,
@@ -37,8 +37,8 @@ def ising_graph(h={}, J={}, attr_dict=None, create_using=None):
     create_using : Graph, optional (default None)
         If provided, this graph is cleared of nodes and edges and filled
         with the new graph. Usually used to set the type of the graph.
-
-
+    **kwargs (dicts): Keyworded arguments are added as attributes to
+        the graph nodes or edges.
     Returns
     -------
     H : a NetworkX Weighted Graph
@@ -54,13 +54,19 @@ def ising_graph(h={}, J={}, attr_dict=None, create_using=None):
     H = nx.empty_graph(0, create_using)
 
     H.name = "ising_graph"
-
+    H.add_nodes_from(h)
     H.add_edges_from(J)
 
-    nx.set_edge_attributes(H,J,'bias')
-    nx.set_node_attributes(H,h,'bias')
+    nx.set_edge_attributes(H, J, name='bias')
+    nx.set_node_attributes(H, h, name='bias')
 
-    if attr_dict:
-        nx.set_node_attributes(H,attr_dict)
+    for name, arg_dict in kwargs.items():
+
+        if all( type(k) is tuple for k in arg_dict ):
+            nx.set_edge_attributes(H, arg_dict, name)
+        elif all( type(k) is int for k in arg_dict ):
+            nx.set_node_attributes(H, arg_dict, name)
+        else:
+            raise ValueError("Dictionaries of attributes must be keyworded strictly with nodes or edges")
 
     return H

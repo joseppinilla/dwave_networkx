@@ -9,7 +9,7 @@ from networkx import diameter
 from dwave_networkx import _PY2
 from dwave_networkx.exceptions import DWaveNetworkXException
 
-__all__ = ['chimera_graph', 'find_chimera_indices']
+__all__ = ['chimera_graph', 'find_chimera_indices', 'get_dims']
 
 # compatibility for python 2/3
 if _PY2:
@@ -274,5 +274,18 @@ def chimera_elimination_order(m, n=None, t=None):
 
     return order
 
+def get_dims(G):
+    """ Retrieve the dimensions of a chimera graph from its name
+    Parameters
+    ----------
+    G : a NetworkX Graph
+        An (m, n, t) Chimera lattice.
+    Returns
+    -------
+    m,n,l: Dimensions tuple
 
+    """
+    dims_str = G.name[G.name.find('(')+1 : G.name.find(')') ].split(',')
+    m, n, l = (int(s) for s in dims_str)
 
+    return m,n,l
