@@ -309,3 +309,5 @@ def get_supply(G):
             supply[(i,j)] += 1
         else:
             supply[(i,j)] = 1
+
+    return supply
