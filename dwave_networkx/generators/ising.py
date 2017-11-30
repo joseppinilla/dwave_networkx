@@ -52,8 +52,8 @@ def ising_graph(h={}, J={}, create_using=None, **kwargs):
 
     """
     H = nx.empty_graph(0, create_using)
+    H.name = "ising_graph(%s, %s)" % ( len(h), len(J) )
 
-    H.name = "ising_graph"
     H.add_nodes_from(h)
     H.add_edges_from(J)
 

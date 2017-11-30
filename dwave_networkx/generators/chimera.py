@@ -9,7 +9,7 @@ from networkx import diameter
 from dwave_networkx import _PY2
 from dwave_networkx.exceptions import DWaveNetworkXException
 
-__all__ = ['chimera_graph', 'find_chimera_indices', 'get_dims']
+__all__ = ['chimera_graph', 'find_chimera_indices', 'get_dims', 'get_supply']
 
 # compatibility for python 2/3
 if _PY2:
@@ -286,6 +286,26 @@ def get_dims(G):
 
     """
     dims_str = G.name[G.name.find('(')+1 : G.name.find(')') ].split(',')
-    m, n, l = (int(s) for s in dims_str)
+    m, n, t = (int(s) for s in dims_str)
 
-    return m,n,l
+    return m,n,t
+
+def get_supply(G):
+    """ Retrieve the supply of each tile in the chimera graph
+    Parameters
+    ----------
+    G : a NetworkX Graph
+        An (m, n, t) Chimera lattice.
+    Returns
+    -------
+    supply: Dictionary
+        Supply of each tile keyworded by (m,n)
+
+    """
+    supply = {}
+    for node in G:
+        i, j, u, k = G.nodes[node]['chimera_index']
+        if ((i,j) in supply):
+            supply[(i,j)] += 1
+        else:
+            supply[(i,j)] = 1
